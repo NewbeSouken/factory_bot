@@ -1,42 +1,42 @@
-$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
-$LOAD_PATH << File.join(File.dirname(__FILE__))
+require "rspec"
+require "rspec/its"
 
-require 'rubygems'
-require 'spec'
-require 'spec/autorun'
-require 'rr'
+require "simplecov"
 
-require 'factory_girl'
+require "factory_bot"
+require "timecop"
 
-Spec::Runner.configure do |config|
-  config.mock_with RR::Adapters::Rspec
-end
+Dir["spec/support/**/*.rb"].each { |f| require File.expand_path(f) }
 
-share_as :DefinesConstants do
-  before do
-    @defined_constants = []
+RSpec.configure do |config|
+  config.mock_with :rspec do |mocks|
+    # Prevents you from mocking or stubbing a method that does not exist on a
+    # real object. This is generally recommended, and will default to `true` in
+    # RSpec 4.
+    mocks.verify_partial_doubles = true
   end
 
-  after do
-    @defined_constants.reverse.each do |path|
-      namespace, class_name = *constant_path(path)
-      namespace.send(:remove_const, class_name)
+  config.include DeclarationMatchers
+
+  config.before do
+    FactoryBot.reload
+  end
+
+  config.after do
+    Timecop.return
+  end
+
+  config.around do |example|
+    begin
+      previous_use_parent_strategy = FactoryBot.use_parent_strategy
+      example.run
+    ensure
+      FactoryBot.use_parent_strategy = previous_use_parent_strategy
     end
   end
 
-  def define_constant(path, base = Object, &block)
-    namespace, class_name = *constant_path(path)
-    klass = Class.new(base)
-    namespace.const_set(class_name, klass)
-    klass.class_eval(&block) if block_given?
-    @defined_constants << path
-    klass
-  end
+  config.order = :random
+  Kernel.srand config.seed
 
-  def constant_path(constant_name)
-    names = constant_name.split('::')
-    class_name = names.pop
-    namespace = names.inject(Object) { |result, name| result.const_get(name) }
-    [namespace, class_name]
-  end
+  config.example_status_persistence_file_path = "tmp/rspec_examples.txt"
 end

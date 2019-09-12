@@ -30,7 +30,7 @@ Configure your test suite
 
 ### RSpec
 
-If you're using Rails:
+If you're using Rails, add the following configuration to `spec/support/factory_bot.rb` and be sure to require that file in `rails_helper.rb`:
 
 ```ruby
 RSpec.configure do |config|
@@ -387,7 +387,7 @@ post.new_record?        # => true
 post.author.new_record? # => false
 ```
 
-To not save the associated object, specify strategy: :build in the factory:
+To not save the associated object, specify `strategy: :build` in the factory:
 
 ```ruby
 FactoryBot.use_parent_strategy = false
@@ -516,14 +516,14 @@ FactoryBot.define do
   factory :photo
 
   factory :comment do
-    for_photo
+    for_photo # default to the :for_photo trait if none is specified
 
     trait :for_video do
-      association(:commentable, factory: :video)
+      association :commentable, factory: :video
     end
 
     trait :for_photo do
-      association(:commentable, factory: :photo)
+      association :commentable, factory: :photo
     end
   end
 end
@@ -961,7 +961,7 @@ If a gem were to give you a User factory:
 ```ruby
 FactoryBot.define do
   factory :user do
-    full_name "John Doe"
+    full_name { "John Doe" }
     sequence(:username) { |n| "user#{n}" }
     password { "password" }
   end
@@ -1066,10 +1066,11 @@ Example Rake task:
 namespace :factory_bot do
   desc "Verify that all FactoryBot factories are valid"
   task lint: :environment do
-    if Rails.env.test?
-      DatabaseCleaner.clean_with(:deletion)
-      DatabaseCleaner.cleaning do
+    if Rails.env.test?    
+      conn = ActiveRecord::Base.connection
+      conn.transaction do
         FactoryBot.lint
+        raise ActiveRecord::Rollback
       end
     else
       system("bundle exec rake factory_bot:lint RAILS_ENV='test'")
@@ -1081,8 +1082,7 @@ end
 
 After calling `FactoryBot.lint`, you'll likely want to clear out the
 database, as records will most likely be created. The provided example above
-uses the database_cleaner gem to clear out the database; be sure to add the
-gem to your Gemfile under the appropriate groups.
+uses an sql transaction and rollback to leave the database clean.
 
 You can lint factories selectively by passing only factories you want linted:
 

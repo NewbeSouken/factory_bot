@@ -5,7 +5,7 @@ factory_bot is a fixtures replacement with a straightforward definition syntax, 
 If you want to use factory_bot with Rails, see
 [factory_bot_rails](https://github.com/thoughtbot/factory_bot_rails).
 
-_[Interested in the history of the project name?](NAME.md)_
+_[Interested in the history of the project name?][NAME]_
 
 
 ### Transitioning from factory\_girl?
@@ -59,9 +59,13 @@ More Information
 * [Issues](https://github.com/thoughtbot/factory_bot/issues)
 * [GIANT ROBOTS SMASHING INTO OTHER GIANT ROBOTS](https://robots.thoughtbot.com/)
 
-You may also find useful information under the [factory_girl tag on Stack Overflow](https://stackoverflow.com/questions/tagged/factory-girl).
+[GETTING_STARTED]: https://github.com/thoughtbot/factory_bot/blob/master/GETTING_STARTED.md
+[NAME]: https://github.com/thoughtbot/factory_bot/blob/master/NAME.md
 
-[GETTING_STARTED]: https://www.rubydoc.info/gems/factory_bot/file/GETTING_STARTED.md
+Useful Tools
+------------
+
+* [FactoryTrace](https://github.com/djezzzl/factory_trace) - helps to find unused factories and traits.
 
 Contributing
 ------------
@@ -77,7 +81,10 @@ License
 
 factory_bot is Copyright © 2008-2019 Joe Ferris and thoughtbot. It is free
 software, and may be redistributed under the terms specified in the
-[LICENSE](/LICENSE) file.
+[LICENSE] file.
+
+[LICENSE]: https://github.com/thoughtbot/factory_bot/blob/master/LICENSE
+
 
 About thoughtbot
 ----------------
